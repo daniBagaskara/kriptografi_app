@@ -48,7 +48,7 @@ Ikuti langkah-langkah berikut untuk menginstal proyek ini:
 
 ### 1. Clone Repository  
 ```bash  
-git clone <URL_REPO_ANDA>  
+git clone <URL_REPO_INI>  
 cd <NAMA_FOLDER_REPO>  
 ```
 
