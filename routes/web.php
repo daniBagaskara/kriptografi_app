@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnkripsiFileController;
 use App\Http\Controllers\EnkripsiTextController;
+use App\Http\Controllers\SteganographyController;
 
 // Route to show page Auth
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -28,5 +29,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dekripsi-file', [EnkripsiFileController::class, 'showFormDekripsi'])->name('dekripsi-file.form');
     Route::post('/dekripsi-file', [EnkripsiFileController::class, 'processDekripsi'])->name('dekripsi-file.process');
+
+    Route::get('/steganography/hide', [SteganographyController::class, 'showFormHide'])->name('enkripsi-image');
+    Route::post('/steganography/hide', [SteganographyController::class, 'hideMessage'])->name('steganography.hide.process');
+
+    Route::get('/steganography/extract', [SteganographyController::class, 'showFormExtract'])->name('dekripsi-image');
+    Route::post('/steganography/extract', [SteganographyController::class, 'extractMessage'])->name('steganography.extract.process');
+
     Route::get('/download/{id}', [DashboardController::class, 'download'])->name('download');
 });

@@ -8,13 +8,13 @@
             </h5>
             <h3 class="text-2xl font-bold">{{ $totalTexts }}</h3>
         </div>
-        <div class="bg-green-500 text-white p-6 rounded-lg shadow-lg">
+        {{-- <div class="bg-green-500 text-white p-6 rounded-lg shadow-lg">
             <h5 class="text-lg font-semibold flex items-center space-x-2">
                 <i class="fas fa-image"></i>
                 <span>Total Gambar</span>
             </h5>
             <h3 class="text-2xl font-bold">{{ $totalImages }}</h3>
-        </div>
+        </div> --}}
         <div class="bg-yellow-500 text-white p-6 rounded-lg shadow-lg">
             <h5 class="text-lg font-semibold flex items-center space-x-2">
                 <i class="fas fa-file"></i>
@@ -39,9 +39,9 @@
             <i class="fas fa-image text-green-500 text-4xl mb-4"></i>
             <h5 class="text-lg font-semibold">Enkripsi Gambar</h5>
             <p class="text-gray-600 mb-4">Enkripsi gambar menggunakan steganografi</p>
-            <button disabled class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+            <a href="{{ route('enkripsi-image') }}" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
                 Mulai
-            </button>
+            </a>
         </div>
         <div class="bg-white shadow-lg rounded-lg p-6 text-center feature-card">
             <i class="fas fa-file text-yellow-500 text-4xl mb-4"></i>
@@ -66,9 +66,9 @@
             <i class="fas fa-image text-green-500 text-4xl mb-4"></i>
             <h5 class="text-lg font-semibold">Dekripsi Gambar</h5>
             <p class="text-gray-600 mb-4">Dekripsi gambar menggunakan steganografi</p>
-            <button disabled class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+            <a href="{{ route('dekripsi-image') }}" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
                 Mulai
-            </button>
+            </a>
         </div>
         <div class="bg-white shadow-lg rounded-lg p-6 text-center feature-card">
             <i class="fas fa-comment text-blue-500 text-4xl mb-4"></i>
@@ -87,6 +87,7 @@
             <i class="fas fa-clock"></i>
             <span>Aktivitas Terbaru</span>
         </h5>
+        <small>*History hanya menampilkan proses text dan file.</small>
         <table class="w-full table-auto border-collapse">
             <thead>
                 <tr class="bg-gray-100 text-left">

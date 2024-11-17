@@ -62,14 +62,14 @@
                         <i class="fas fa-image"></i>
                         Dekripsi File
                     </a>
-                    <a href="#" class="py-2 px-4 rounded-lg hover:bg-gray-100">
+                    <a href="{{ route('enkripsi-image') }}" class="py-2 px-4 rounded-lg {{ request()->is('enkripsi-image') ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-gray-100' }}">
                         <i class="fas fa-file"></i>
                         Enkripsi Gambar
                     </a>
-                    {{-- <a href="#" class="py-2 px-4 rounded-lg hover:bg-gray-100">
-                        <i class="fas fa-history"></i>
-                        Riwayat
-                    </a> --}}
+                    <a href="{{ route('dekripsi-image') }}" class="py-2 px-4 rounded-lg {{ request()->is('dekripsi-image') ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-file"></i>
+                        Dekripsi Gambar
+                    </a>
                 </nav>
             </div>
         </aside>
