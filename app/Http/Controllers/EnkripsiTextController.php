@@ -4,64 +4,77 @@ namespace App\Http\Controllers;
 
 use App\Models\Enkripsi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EnkripsiTextController extends Controller
 {
-    public function showForm()
+    // untuk menampilkan form enkripsi
+    public function showFormEnkripsi()
     {
         return view('Dashboard.formEnkripsiText');
     }
 
-    public function process(Request $request)
+    // untuk menampilkan form dekripsi
+    public function showFormDekripsi()
     {
-
-        $request->validate([
-            'plaintext' => 'required|string',
-            'key1' => 'required|string', // Key untuk AES
-            'key2' => 'required|integer', // Shift untuk Caesar
-        ]);
-
-        $plaintext = $request->input('plaintext');
-        $key_AES = $request->input('key1');
-        $key_caesar = $request->input('key2');
-
-        $aesCiphertext = $this->AESEncrypt($plaintext, $key_AES);
-
-        $finalCiphertext = $this->caesarEncrypt($aesCiphertext, $key_caesar);
-
-        Enkripsi::create([
-            'data_type' => 'text',
-            'original_data' => $plaintext,
-            'encrypted_data' => $finalCiphertext,
-            'algorithm' => 'AES-256-ECB + Caesar'
-        ]);
-
-        return back()->with([
-            'success' => 'Text berhasil dienkripsi',
-            'encrypted_text' => $finalCiphertext,
-            'original_text' => $request->plaintext
-        ]);
+        return view('Dashboard.formDekripsiText');
     }
 
-    public function AESEncrypt($text, $key)
+    public function processEnkripsi(Request $request)
     {
-        $method = 'AES-256-ECB';
-        $key = hash('sha256', $key, true); // Hash kunci menjadi 256-bit
+        // Validasi input
+        $request->validate([
+            'plaintext' => 'required|string',
+            'key1' => 'required|string|size:16', // Key AES harus 16 karakter
+            'iv' => 'required|string|size:16',   // IV harus 16 karakter
+            'method' => 'required|in:AES-128-CTR,AES-128-CBC,AES-128-CFB',
+            'key2' => 'required|integer',
+        ]);
 
-        return openssl_encrypt($text, $method, $key, 0);
+        try {
+            // Enkripsi AES
+            $aesCiphertext = openssl_encrypt(
+                $request->plaintext,
+                $request->method,
+                $request->key1,
+                0,
+                $request->iv
+            );
+
+            // Enkripsi Caesar
+            $finalCiphertext = $this->caesarEncrypt($aesCiphertext, $request->key2);
+
+            Enkripsi::create([
+                'data_type' => 'text',
+                'original_data' => $request->plaintext,
+                'encrypted_data' => $finalCiphertext,
+                'algorithm' => $request->method . ' + Caesar (key1: ' . $request->key1 . ', key2: ' . $request->key2 . ', iv: ' . $request->iv . ')',
+                'user_id' => Auth::user()->id,
+                'description' => 'Enkripsi'
+            ]);
+
+            return back()->with([
+                'success' => 'Text berhasil dienkripsi',
+                'encrypted_text' => $finalCiphertext,
+                'original_text' => $request->plaintext,
+            ]);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal melakukan enkripsi');
+        }
     }
 
     public function caesarEncrypt($text, $shift)
     {
         $result = '';
-        $shift = intval($shift) % 26;
+        $shift = $shift % 26;
 
         for ($i = 0; $i < strlen($text); $i++) {
             $char = $text[$i];
-
             if (ctype_alpha($char)) {
-                $asciiOffset = ctype_upper($char) ? 65 : 97;
-                $shifted = (($asciiOffset + ord($char) - $asciiOffset + $shift) % 26) + $asciiOffset;
+                $ascii = ord($char);
+                $isUpper = ctype_upper($char);
+                $base = $isUpper ? 65 : 97;
+                $shifted = ($ascii - $base + $shift) % 26 + $base;
                 $result .= chr($shifted);
             } else {
                 $result .= $char;
@@ -71,61 +84,47 @@ class EnkripsiTextController extends Controller
         return $result;
     }
 
-    // public function decrypt(Request $request)
-    // {
-    //     $request->validate([
-    //         'ciphertext' => 'required|string',
-    //         'key1' => 'required|string', // Key untuk AES
-    //         'key2' => 'required|integer', // Shift untuk Caesar
-    //     ]);
 
-    //     $ciphertext = $request->input('ciphertext');
-    //     $key_AES = $request->input('key1');
-    //     $key_caesar = $request->input('key2');
+    public function processDekripsi(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'encrypted_text' => 'required|string',
+            'key1' => 'required|string|size:16', // Key AES harus 16 karakter
+            'iv' => 'required|string|size:16',   // IV harus 16 karakter
+            'method' => 'required|in:AES-128-CTR,AES-128-CBC,AES-128-CFB',
+            'key2' => 'required|integer',
+        ]);
 
-    //     // Langkah 1: Dekripsi Caesar
-    //     $caesarDecrypted = $this->caesarDecrypt($ciphertext, $key_caesar);
+        $caesarDecrypted = $this->caesarDecrypt($request->encrypted_text, $request->key2);
 
-    //     // Langkah 2: Dekripsi AES
-    //     $finalPlaintext = $this->AESDecrypt($caesarDecrypted, $key_AES);
+        $finalPlaintext = openssl_decrypt(
+            $caesarDecrypted,
+            $request->method,
+            $request->key1,
+            0,
+            $request->iv
+        );
 
-    //     return view('Dashboard.result', compact('finalPlaintext'));
-    // }
+        Enkripsi::create([
+            'data_type' => 'text',
+            'original_data' => $finalPlaintext,
+            'encrypted_data' => $request->encrypted_text,
+            'algorithm' => $request->method . ' + Caesar (key1: ' . $request->key1 . ', key2: ' . $request->key2 . ', iv: ' . $request->iv . ')',
+            'user_id' => Auth::user()->id,
+            'description' => 'Dekripsi',
+        ]);
 
-    // public function AESDecrypt($text, $key)
-    // {
-    //     $method = 'AES-256-CBC';
-    //     $key = hash('sha256', $key, true); // Generate kunci AES
+        return back()->with([
+            'success' => 'Text berhasil didekripsi',
+            'decrypted_text' => $finalPlaintext,
+            'encrypted_text' => $request->encrypted_text,
+        ]);
+    }
 
-    //     // Decode teks dari Base64
-    //     $data = base64_decode($text);
-
-    //     // Ekstrak IV dan teks terenkripsi
-    //     $ivLength = openssl_cipher_iv_length($method);
-    //     $iv = substr($data, 0, $ivLength);
-    //     $encryptedText = substr($data, $ivLength);
-
-    //     // Dekripsi menggunakan AES
-    //     return openssl_decrypt($encryptedText, $method, $key, 0, $iv);
-    // }
-
-    // public function caesarDecrypt($text, $shift)
-    // {
-    //     $result = '';
-    //     $shift = intval($shift) % 26;
-
-    //     for ($i = 0; $i < strlen($text); $i++) {
-    //         $char = $text[$i];
-
-    //         if (ctype_alpha($char)) {
-    //             $asciiOffset = ctype_upper($char) ? 65 : 97;
-    //             $shifted = (($asciiOffset + ord($char) - $asciiOffset - $shift + 26) % 26) + $asciiOffset;
-    //             $result .= chr($shifted);
-    //         } else {
-    //             $result .= $char;
-    //         }
-    //     }
-
-    //     return $result;
-    // }
+    public function caesarDecrypt($text, $shift)
+    {
+        // Dekripsi Caesar adalah enkripsi dengan shift negatif
+        return $this->caesarEncrypt($text, 26 - ($shift % 26));
+    }
 }

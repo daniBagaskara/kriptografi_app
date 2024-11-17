@@ -50,13 +50,21 @@
                         <i class="fas fa-comment"></i>
                         Enkripsi Pesan
                     </a>
-                    <a href="#" class="py-2 px-4 rounded-lg hover:bg-gray-100">
+                    <a href="{{ route('dekripsi-text.form') }}" class="py-2 px-4 rounded-lg {{ request()->is('dekripsi-text') ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-comment"></i>
+                        Dekripsi Pesan
+                    </a>
+                    <a href="{{ route('enkripsi-file.form') }}" class="py-2 px-4 rounded-lg {{ request()->is('enkripsi-file') ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-gray-100' }}">
                         <i class="fas fa-image"></i>
-                        Enkripsi Gambar
+                        Enkripsi File
+                    </a>
+                    <a href="{{ route('dekripsi-file.form') }}" class="py-2 px-4 rounded-lg {{ request()->is('dekripsi-file') ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-gray-100' }}">
+                        <i class="fas fa-image"></i>
+                        Dekripsi File
                     </a>
                     <a href="#" class="py-2 px-4 rounded-lg hover:bg-gray-100">
                         <i class="fas fa-file"></i>
-                        Enkripsi File
+                        Enkripsi Gambar
                     </a>
                     {{-- <a href="#" class="py-2 px-4 rounded-lg hover:bg-gray-100">
                         <i class="fas fa-history"></i>

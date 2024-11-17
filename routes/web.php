@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EnkripsiFileController;
 use App\Http\Controllers\EnkripsiTextController;
 
 // Route to show page Auth
@@ -16,6 +17,16 @@ Route::delete('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/enkripsi-text', [EnkripsiTextController::class, 'showForm'])->name('enkripsi-text.form');
-    Route::post('/enkripsi-text', [EnkripsiTextController::class, 'process'])->name('enkripsi-text.process');
+    Route::get('/enkripsi-text', [EnkripsiTextController::class, 'showFormEnkripsi'])->name('enkripsi-text.form');
+    Route::post('/enkripsi-text', [EnkripsiTextController::class, 'processEnkripsi'])->name('enkripsi-text.process');
+
+    Route::get('/dekripsi-text', [EnkripsiTextController::class, 'showFormDekripsi'])->name('dekripsi-text.form');
+    Route::post('/dekripsi-text', [EnkripsiTextController::class, 'processDekripsi'])->name('dekripsi-text.process');
+
+    Route::get('/enkripsi-file', [EnkripsiFileController::class, 'showFormEnkripsi'])->name('enkripsi-file.form');
+    Route::post('/enkripsi-file', [EnkripsiFileController::class, 'processEnkripsi'])->name('enkripsi-file.process');
+
+    Route::get('/dekripsi-file', [EnkripsiFileController::class, 'showFormDekripsi'])->name('dekripsi-file.form');
+    Route::post('/dekripsi-file', [EnkripsiFileController::class, 'processDekripsi'])->name('dekripsi-file.process');
+    Route::get('/download/{id}', [DashboardController::class, 'download'])->name('download');
 });

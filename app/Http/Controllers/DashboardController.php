@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Enkripsi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -15,7 +17,7 @@ class DashboardController extends Controller
         $totalFiles = Enkripsi::where('data_type', 'file')->count();
 
         // Ambil semua data untuk fitur history (diurutkan dari terbaru)
-        $history = Enkripsi::select('data_type', 'algorithm', 'created_at', 'original_data')
+        $history = Enkripsi::select('id', 'data_type', 'algorithm', 'created_at', 'original_data', 'description')->where('user_id', Auth::user()->id)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -26,5 +28,23 @@ class DashboardController extends Controller
             'totalFiles' => $totalFiles ?? 0,
             'historys' => $history ?? [], // Tambahkan history ke view
         ]);
+    }
+
+    public function download($id)
+    {
+        $enkripsi = Enkripsi::findOrFail($id);
+        $fileName = 'encrypted_data' . $id . '.txt';
+        $headers = [
+            'Content-Type' => 'text/plain',
+        ];
+
+        return response(
+            "Original Data: " . $enkripsi->original_data . "\n" .
+                "Encrypted Data: " . $enkripsi->encrypted_data . "\n" .
+                "Algorithm: " . $enkripsi->algorithm . "\n" .
+                "Data Type: " . $enkripsi->data_type,
+            200,
+            $headers
+        )->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 }
