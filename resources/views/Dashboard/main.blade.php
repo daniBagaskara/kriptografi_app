@@ -113,7 +113,7 @@
                                 class="bg-green-500 text-white py-1 px-3 rounded-full text-sm">Sukses</span></td>
                         <td class="p-3">
                             <a href="{{ route('download', ['id' => $history->id]) }}" class="text-blue-500 hover:underline">
-                                Unduh Kunci Enkripsi
+                                Detail Information
                             </a>
                         </td>
                     </tr>

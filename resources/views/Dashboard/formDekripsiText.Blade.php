@@ -52,7 +52,7 @@
                         <div class="mt-1">
                             <input type="text" name="iv"
                                 class="block p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                required placeholder="Masukkan IV (Base64)" value="{{ old('iv') }}">
+                                required placeholder="Masukkan IV" value="{{ old('iv') }}">
                         </div>
                         @error('iv')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

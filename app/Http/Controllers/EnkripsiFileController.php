@@ -37,16 +37,20 @@ class EnkripsiFileController extends Controller
         // Enkripsi file
         $encryptedContent = $this->encryptContent($fileContent, $key);
 
-        // Buat file metadata (berisi informasi enkripsi)
+        // Buat file metadata yang berisi informasi enkripsi
         $metadata = [
             'original_name' => $originalName,
             'encryption_method' => 'AES-256-CBC',
             'date_encrypted' => now()->toString(),
-            'instructions' => "Use the provided key to decrypt this file.\n You can download the key in the dashboard page."
+            'instructions' => "File ini telah dienkripsi menggunakan metode AES-256-CBC." .
+                "Gunakan kunci yang telah disediakan untuk mendekripsi file ini." .
+                "Anda dapat mengunduh kunci tersebut di halaman dashboard." .
+                "Peringatan: Jangan pernah mengubah file ini jika ingin mendekripsinya."
         ];
 
+
         // Gabung metadata dengan file terenkripsi
-        $finalContent = json_encode($metadata) . "\n\n\n\n===ENCRYPTED_CONTENT===\n" . $encryptedContent;
+        $finalContent = json_encode($metadata, JSON_PRETTY_PRINT) . "\n\n\n\n===ENCRYPTED_CONTENT===\n" . $encryptedContent;
 
         Enkripsi::create([
             'data_type' => 'file',
@@ -116,7 +120,7 @@ class EnkripsiFileController extends Controller
             // Simpan record dekripsi ke database
             Enkripsi::create([
                 'data_type' => 'file',
-                'algorithm' => 'AES-256-CBC',
+                'algorithm' => 'AES-256-CBC' . ' | key: ' . $key,
                 'original_data' => $metadata['original_name'],
                 'encrypted_data' => $fileContent,
                 'user_id' => Auth::id(),

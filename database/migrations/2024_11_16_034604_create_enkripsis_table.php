@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('enkripsis', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->enum('data_type', ['text', 'file', 'image']); // Jenis data
-            $table->text('original_data')->nullable(); // Data asli (untuk teks)
-            $table->text('encrypted_data')->nullable(); // Data terenkripsi (untuk teks)
+            $table->longText('original_data')->nullable(); // Data asli (untuk teks)
+            $table->longText('encrypted_data')->nullable(); // Data terenkripsi (untuk teks)
             $table->string('file_path')->nullable(); // Path file asli (untuk file)
             $table->string('encrypted_file_path')->nullable(); // Path file terenkripsi
             $table->binary('image_data')->nullable(); // Gambar asli (untuk gambar)
